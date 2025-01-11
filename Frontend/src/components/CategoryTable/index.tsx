@@ -1,16 +1,20 @@
 import { Box, Button, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchBar from '../../molecules/SearchBar';
 import { PRIMARY_CLR } from '../../assets/colors';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
+import { getCategoryData } from '../../features/Category/CategoryService';
+import { setCategoryData } from '../../features/Category/CategorySlice';
+import { useDispatch } from 'react-redux';
 
 
 type CategoryTableProps = {
-    id: string,
+    id: number,
     category_name: string,
 }
 
 const CategoryTable = () => {
+  const dispatch = useDispatch();
       const [data, setData] = useState<CategoryTableProps[]>([]);
       const [searchQuery, setSearchQuery] = useState<string>("");
       const [editedData, setEditedData] = useState<CategoryTableProps[]>([]);
@@ -23,12 +27,25 @@ const CategoryTable = () => {
     
         const filteredData = data.filter(
           (item) =>
-            item.id.toLowerCase().includes(query) ||
             item.category_name.toLowerCase().includes(query)
         );
     
         setEditedData(filteredData);
       };
+
+       useEffect(() => {
+          const getData = async () => {
+            const response = await getCategoryData();
+            if (response.every(item => 'id' in item && 'category_name' in item)) {
+                setData(response);
+                setEditedData(response);
+                dispatch(setCategoryData(response));
+            } else {
+                console.error('Invalid data structure received from API');
+            }
+        };
+          getData();
+        }, [dispatch]);
   return (
     <Box>
         <SearchBar value={searchQuery} onChange={onChangeData}/>
@@ -105,16 +122,6 @@ const CategoryTable = () => {
             <Typography variant="h6" sx={{ fontWeight: 600, color: '#1b2f47' }}>
               Edit Item
             </Typography>
-
-            <TextField
-              label="Name"
-              fullWidth
-              margin="normal"
-              value={editItem.id}
-              onChange={(e) =>
-                setEditItem({ ...editItem, id: e.target.value })
-              }
-            />
 
             <TextField
               label="Category"

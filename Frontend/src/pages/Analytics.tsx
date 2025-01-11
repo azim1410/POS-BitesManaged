@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import { CONTAINER_BG_CLR } from '../assets/colors'
 import PageHeader from '../components/PageHeader'
 import { useEffect, useState } from 'react'
-import { calculateSales, calculateTodaysSales } from '../features/Analytics/AnalyticsServices'
+import { calculateSales, calculateTodaysSales, displayCategorySales } from '../features/Analytics/AnalyticsServices'
 import SalesCard from '../atoms/SalesCard'
 import PastSevenDaysChart from '../molecules/AnalyticsCharts/PastSevenDaysChart'
 
@@ -28,11 +28,16 @@ const Analytics = () => {
     setPastYear(response.pastYear);
   }
 
+  const getCategorySalesData = async () => {
+    const response = await displayCategorySales();
+    console.log(response);
+  }
 
 
   useEffect(() => {
     getTodaysSales();
     getSalesData();
+    getCategorySalesData();
   }, []);
 
 

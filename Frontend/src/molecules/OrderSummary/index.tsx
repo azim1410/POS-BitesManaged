@@ -6,8 +6,8 @@ import ItemBar from '../../atoms/ItemBar';
 import { HEADER_TXT_CLR, PRIMARY_CLR, SMALL_TXT_CLR } from '../../assets/colors';
 import { useState } from 'react';
 import { VscPercentage } from "react-icons/vsc";
-import { MdOutlineNumbers } from "react-icons/md";
 import { applyDiscount } from '../../features/orders/OrderSlice';
+import { MdOutlineCurrencyRupee } from "react-icons/md";
 
 const OrderSummary = () => {
     const dispatch = useDispatch();
@@ -32,7 +32,7 @@ const OrderSummary = () => {
         } else {
             // Percentage discount
             if (discount >= 0 && discount <= 100) {
-                const calculatedDiscount = (totalAmount * discount) / 100;
+                const calculatedDiscount = (parseFloat(totalAmount) * discount) / 100;
                 dispatch(applyDiscount(calculatedDiscount));
             } else {
                 alert("Percentage must be between 0 and 100");
@@ -78,20 +78,21 @@ const OrderSummary = () => {
                         sx={{ backgroundColor: discTypeAmnt === true ? '#cbdbfe' : '#ffffff' }}
                         onClick={selectDiscount}
                     >
-                        <MdOutlineNumbers />
+                        <MdOutlineCurrencyRupee />
                     </Button>
                 </Box>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     onClick={handleapplyDiscount}
                     sx={{
-                        backgroundColor: PRIMARY_CLR,
+                        // backgroundColor: PRIMARY_CLR,
                         borderRadius: '8px',
                         boxShadow: 'none',
                         marginRight: '0.5rem',
+                        height:'3rem'
                     }}
                 >
-                    Apply
+                    Apply discount
                 </Button>
             </Box>
             <Box

@@ -24,6 +24,13 @@ const UtilityBtns = ({save, kot, reset}: UtilityProps) => {
                     boxShadow: "none",
                     marginRight: '0.5rem'
                 }}>KOT</Button>
+                <Button variant="contained" onClick={kot}
+                sx={{
+                    backgroundColor: PRIMARY_CLR,
+                    borderRadius: "8px",
+                    boxShadow: "none",
+                    marginRight: '0.5rem'
+                }}>KOT & Print</Button>
             <Button variant="contained" onClick={reset}
                 sx={{
                     backgroundColor: PRIMARY_CLR,

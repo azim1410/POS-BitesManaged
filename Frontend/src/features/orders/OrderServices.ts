@@ -3,6 +3,7 @@ import { supabase } from "../../database/supabaseClient";
 export type orderSingleItem = {
     name: string,
     price: string,
+    category: string,
     quantity: string,
 }
 
@@ -16,7 +17,8 @@ export type OrderItem = {
     order: {
         items: Array<{
             name: string;
-            price: string; // Price is stored as a string in the database
+            price: string;
+            category: string; // Price is stored as a string in the database
             quantity: string; // Quantity is stored as a string in the database
         }>;
         total: string;
@@ -28,7 +30,7 @@ export type OrderItem = {
 export const getOrdersData = async (): Promise<OrderItem[]> => {
     try {
         const { data, error } = await supabase
-        .from("Orders")
+        .from("OrderItem")
         .select("*")
         .gte("created_at", new Date().toISOString().split("T")[0]) // Start of today
         .lt("created_at", new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split("T")[0]); 
@@ -50,6 +52,7 @@ export const getOrdersData = async (): Promise<OrderItem[]> => {
                 items: order.order.items.map((item: orderSingleItem) => ({
                     name: item.name,
                     price: item.price,
+                    category: item.category,
                     quantity: item.quantity,
                 })),
                 total: order.order.total,

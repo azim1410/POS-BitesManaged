@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit'
 import inventoryReducer from "../features/inventory/inventorySlice"
 import OrderReducer from "../features/orders/OrderSlice";
 import PendingOrdersReducer from '../features/PendingOrders/PendingOrderSlice';
+import CategoryReducer from '../features/Category/CategorySlice';
 export const store = configureStore({
   reducer: {
     inventory: inventoryReducer,
     order: OrderReducer,
-    pendingorders: PendingOrdersReducer
+    pendingorders: PendingOrdersReducer,
+    category: CategoryReducer,
   },
 })
 

@@ -22,6 +22,7 @@ const TextInpSmall = ({ label, name, value, onChange }: TxtFeildProps) => {
                 fontSize: '0.8rem',
                 '& .MuiInputBase-root': {
                     height: '30px',
+                    borderRadius: 2,
                 },
                 '& .MuiInputBase-input': {
                     padding: '5px',

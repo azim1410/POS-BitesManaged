@@ -1,5 +1,6 @@
 import { supabase } from "../../database/supabaseClient";
-
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 
 export const calculateTodaysSales = async (): Promise<number> => {
@@ -10,7 +11,7 @@ export const calculateTodaysSales = async (): Promise<number> => {
             .split("T")[0];
 
         const { data, error } = await supabase
-            .from("Orders")
+            .from("OrderItem")
             .select("order->>total", { count: "exact" }) // Select only the "total" field from the JSON
             .gte("created_at", todayStart)
             .lt("created_at", tomorrowStart);
@@ -47,7 +48,7 @@ export const calculateSales = async (): Promise<{ past7Days: number; pastMonth: 
         // Helper function to calculate sales for a given time period
         const calculatePeriodSales = async (startDate: string, endDate: string): Promise<number> => {
             const { data, error } = await supabase
-                .from("Orders")
+                .from("OrderItem")
                 .select("order->>total", { count: "exact" }) // Select only the "total" field from the JSON
                 .gte("created_at", startDate)
                 .lt("created_at", endDate);
@@ -88,13 +89,11 @@ export const calculateSales = async (): Promise<{ past7Days: number; pastMonth: 
 
 export const calculateSalesPerDayLast7Days = async (): Promise<number[]> => {
     try {
-        const todayStart = new Date().toISOString(); // Include time for accurate filtering
-        const tomorrowStart = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString();
         
         // Helper function to calculate sales for a specific day
         const calculateDaySales = async (startDate: string, endDate: string): Promise<number> => {
             const { data, error } = await supabase
-                .from("Orders")
+                .from("OrderItem")
                 .select("order->>total", { count: "exact" }) // Select only the "total" field from the JSON
                 .gte("created_at", startDate)
                 .lt("created_at", endDate);
@@ -137,3 +136,71 @@ export const calculateSalesPerDayLast7Days = async (): Promise<number[]> => {
 
 
 
+export const calculateCategorySales = async (): Promise<Record<string, number>> => {
+  try {
+    // Fetch orders data from Supabase
+    const { data, error } = await supabase
+      .from("OrderItem")
+      .select("order->>items", { count: "exact" });
+
+    if (error) {
+      throw new Error(`Error fetching order data: ${error.message}`);
+    }
+
+    if (!data || data.length === 0) {
+      return {}; // No data means no sales
+    }
+
+    // Initialize a map to store sales by category ID
+    const categorySales: Record<number, number> = {};
+
+    // Process each order's items
+    data.forEach((order) => {
+      // Parse the items array from the JSON field
+      const items = JSON.parse(order.items || "[]");
+
+      items.forEach((item: { category: number; price: string; quantity: string }) => {
+        const { category, price, quantity } = item;
+
+        // Ensure the values are valid numbers
+        const itemPrice = parseFloat(price);
+        const itemQuantity = parseInt(quantity, 10);
+
+        if (!isNaN(itemPrice) && !isNaN(itemQuantity)) {
+          // Add the sales for this item to the respective category
+          categorySales[category] = (categorySales[category] || 0) + itemPrice * itemQuantity;
+        }
+      });
+    });
+
+    return categorySales;
+  } catch (error) {
+    console.error("Error occurred while calculating category sales:", error);
+    return {};
+  }
+};
+
+const categories = useSelector((state: RootState) => state.category.categories);
+export const displayCategorySales = async () => {
+  const salesByCategory = await calculateCategorySales();
+
+  // Create a map for quick category ID to name lookup
+  const categoryMap = categories.reduce((map, category) => {
+    map[category.id] = category.category_name;
+    return map;
+  }, {} as Record<number, string>);
+
+  // Map sales data to category names
+  const salesWithCategoryNames = Object.entries(salesByCategory).reduce(
+    (result, [id, total]) => {
+      const categoryName = categoryMap[parseInt(id, 10)] || `Unknown Category (${id})`;
+      result[categoryName] = total;
+      return result;
+    },
+    {} as Record<string, number>
+  );
+
+  console.log("Sales by Category Name:", salesWithCategoryNames);
+
+  return salesWithCategoryNames;
+};

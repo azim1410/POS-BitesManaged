@@ -41,7 +41,7 @@ export type InventoryItem = {
 export const getInventoryData = async (): Promise<InventoryItem[]> => {
     try {
         const { data, error } = await supabase
-            .from("inventory")
+            .from("InventoryTable")
             .select("*");
 
         if (error) {

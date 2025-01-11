@@ -38,6 +38,7 @@ const CreateOrder = () => {
             const item = {
                 name: newValue.name,
                 price: newValue.price.toString(),
+                category: newValue.category,
                 quantity: '1',
             }
             dispatch(addItemToOrder(item));
@@ -49,33 +50,6 @@ const CreateOrder = () => {
         dispatch(addtoPendingOrders(finalOrder));
         handleReset();
     }
-    // const handleKOT = async () => {
-    //     console.log(finalOrder);
-    //     const newOrder = {
-    //         customer_name: finalOrder.customer_name,
-    //         ph_number: finalOrder.ph_number,
-    //         order: {
-    //             items: Object.entries(finalOrder.order.items).map(([id, product]) => ({
-    //                 name: product.name,
-    //                 price: product.price.toString(),
-    //                 quantity: product.quantity.toString(),
-    //             })),
-    //             total: finalOrder.order.total.toString(),
-    //         },
-    //     };
-    //     try {
-    //         const { data, error } = await supabase.from('Orders').insert([newOrder]);
-    //         if (error) throw error;
-
-    //         console.log('Order created:', data);
-    //         notifySuccess();
-    //         // window.print(); 
-    //         handleReset();
-    //     } catch (error) {
-    //         console.error('Error creating order:', (error as Error).message);
-    //     }
-
-    // }
 
 
     const handleKOT = async () => {
@@ -86,6 +60,7 @@ const CreateOrder = () => {
                 items: Object.entries(finalOrder.order.items).map(([id, product]) => ({
                     name: product.name,
                     price: product.price.toString(),
+                    category: product.category,
                     quantity: product.quantity.toString(),
                 })),
                 total: finalOrder.order.total.toString(),
@@ -93,7 +68,7 @@ const CreateOrder = () => {
         };
 
         try {
-            const { data, error } = await supabase.from('Orders').insert([newOrder]);
+            const { data, error } = await supabase.from('OrderItem').insert([newOrder]);
             if (error) throw error;
 
             console.log('Order created:', data);
@@ -184,9 +159,22 @@ const CreateOrder = () => {
             </Box>
             <Autocomplete
                 options={products || []}
-                getOptionLabel={(option) => `${option.id} - ${option.name} (${option.category})`}
+                getOptionLabel={(option) => `${option.id} - ${option.name}`}
                 value={selectedProduct}
                 onChange={handleAddProducttoCart}
+                size="small" // Reduces the TextField height
+                sx={{
+                    '& .MuiInputBase-root': {
+                        height: '36px', // Custom height
+                        borderRadius: 3,
+                    },
+                    '& .MuiInputBase-input': {
+                        padding: '6px', // Adjust padding inside the input
+                    },
+                    '& .MuiFormLabel-root': {
+                        fontSize: '0.75rem', // Adjust label font size
+                    },
+                }}
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -200,7 +188,6 @@ const CreateOrder = () => {
                     return options.filter(
                         (option) =>
                             option.name.toLowerCase().includes(inputValue) ||
-                            option.category.toLowerCase().includes(inputValue) ||
                             option.id.toString().includes(inputValue)
                     );
                 }}

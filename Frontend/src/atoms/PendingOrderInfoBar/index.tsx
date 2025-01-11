@@ -27,6 +27,7 @@ const PendingOrderInfoBar = ({ index, order }: infoBarProps) => {
             display: 'flex', padding: '0.5rem', marginBottom: '0.2rem', borderRadius: 2, justifyContent: 'space-between', alignItems: 'center',
         }}>
             <Box sx={{width:'50%', display: 'flex', alignItems: 'center' }}>
+                {/* <Typography sx={{ fontWeight: 600, color: SMALL_TXT_CLR }}>{index}</Typography> */}
                 <IoTimerOutline fontSize={30} />
                 <Box sx={{ textAlign: 'left', marginLeft:'0.2rem' }}>
                     <Typography sx={{ fontSize: '0.8rem', fontWeight: 200 }}>{order.customer_name}</Typography>
